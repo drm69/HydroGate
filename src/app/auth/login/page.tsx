@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState, FormEvent } from "react"
 import { useRouter } from "next/navigation"
+import { FirebaseError } from "firebase/app"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 
@@ -30,16 +31,20 @@ export default function LoginPage() {
             await signInWithEmailAndPassword(auth, email, password)
 
             router.push("/dashboard")
-        } catch (err: any) {
-            switch (err.code) {
-                case "auth/invalid-credential":
-                    setError("Email atau password salah")
-                    break
-                case "auth/user-not-found":
-                    setError("User tidak ditemukan")
-                    break
-                default:
-                    setError("Gagal login, coba lagi")
+        } catch (err: unknown) {
+            if (err instanceof FirebaseError) {
+                switch (err.code) {
+                    case "auth/invalid-credential":
+                        setError("Email atau password salah")
+                        break
+                    case "auth/user-not-found":
+                        setError("User tidak ditemukan")
+                        break
+                    default:
+                        setError("Gagal login, coba lagi")
+                }
+            } else {
+                setError("Gagal login, coba lagi")
             }
         } finally {
             setLoading(false)
@@ -64,8 +69,6 @@ export default function LoginPage() {
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-5">
-
-                        {/* EMAIL */}
                         <div>
                             <label className="mb-2 block text-sm text-slate-300">
                                 Email
@@ -79,7 +82,6 @@ export default function LoginPage() {
                             />
                         </div>
 
-                        {/* PASSWORD */}
                         <div>
                             <label className="mb-2 block text-sm text-slate-300">
                                 Password
@@ -103,14 +105,12 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        {/* ERROR */}
                         {error && (
                             <div className="text-sm text-red-400">
                                 {error}
                             </div>
                         )}
 
-                        {/* BUTTON */}
                         <button
                             type="submit"
                             disabled={loading}

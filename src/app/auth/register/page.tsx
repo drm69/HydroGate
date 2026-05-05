@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
+import { FirebaseError } from "firebase/app"
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { doc, serverTimestamp, setDoc } from "firebase/firestore"
 import { auth, db } from "@/lib/firebase"
@@ -53,19 +54,23 @@ export default function RegisterPage() {
 
             setSuccess("User berhasil ditambahkan.")
             router.push("/login")
-        } catch (err: any) {
-            switch (err.code) {
-                case "auth/email-already-in-use":
-                    setError("Email sudah digunakan.")
-                    break
-                case "auth/invalid-email":
-                    setError("Format email tidak valid.")
-                    break
-                case "auth/weak-password":
-                    setError("Password terlalu lemah.")
-                    break
-                default:
-                    setError("Gagal menambahkan user. Coba lagi.")
+        } catch (err: unknown) {
+            if (err instanceof FirebaseError) {
+                switch (err.code) {
+                    case "auth/email-already-in-use":
+                        setError("Email sudah digunakan.")
+                        break
+                    case "auth/invalid-email":
+                        setError("Format email tidak valid.")
+                        break
+                    case "auth/weak-password":
+                        setError("Password terlalu lemah.")
+                        break
+                    default:
+                        setError("Gagal menambahkan user. Coba lagi.")
+                }
+            } else {
+                setError("Gagal menambahkan user. Coba lagi.")
             }
         } finally {
             setLoading(false)

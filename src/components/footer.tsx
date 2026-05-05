@@ -1,13 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 export default function Footer() {
-  const [year, setYear] = useState<number | null>(null);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
+  const year = new Date().getFullYear();
 
   return (
     <footer className="relative border-t border-white/[0.06] py-14 px-6 bg-[#020d1a]">
@@ -18,11 +12,11 @@ export default function Footer() {
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path d="M3 9C3 6.2 5.2 4 8 4h2c2.8 0 5 2.2 5 5v1H3V9z" fill="white" opacity="0.9"/>
-                  <rect x="1" y="10" width="16" height="2.5" rx="1" fill="white" opacity="0.6"/>
-                  <rect x="4" y="12.5" width="2" height="3" rx="0.5" fill="white"/>
-                  <rect x="8" y="12.5" width="2" height="3" rx="0.5" fill="white"/>
-                  <rect x="12" y="12.5" width="2" height="3" rx="0.5" fill="white"/>
+                  <path d="M3 9C3 6.2 5.2 4 8 4h2c2.8 0 5 2.2 5 5v1H3V9z" fill="white" opacity="0.9" />
+                  <rect x="1" y="10" width="16" height="2.5" rx="1" fill="white" opacity="0.6" />
+                  <rect x="4" y="12.5" width="2" height="3" rx="0.5" fill="white" />
+                  <rect x="8" y="12.5" width="2" height="3" rx="0.5" fill="white" />
+                  <rect x="12" y="12.5" width="2" height="3" rx="0.5" fill="white" />
                 </svg>
               </div>
               <div>

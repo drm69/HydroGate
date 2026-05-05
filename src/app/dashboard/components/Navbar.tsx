@@ -2,40 +2,44 @@
 
 import { Bell, User, LogOut } from "lucide-react";
 import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react"
-import { doc, getDoc } from "firebase/firestore"
-import { db } from "@/lib/firebase"
-import { useAuthContext } from "@/components/AuthProvider"
+import { useEffect, useState } from "react";
+import { useAuthContext } from "@/components/AuthProvider";
+
+interface UserData {
+  username?: string;
+  role?: string;
+}
 
 export default function Navbar() {
   const router = useRouter();
 
   const [showNotif, setShowNotif] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
 
-  const { user } = useAuthContext()
+  const { user } = useAuthContext();
 
-  const [userData, setUserData] = useState<any>(null)
   useEffect(() => {
     const fetchUser = async () => {
-      if (!user) return
+      if (!user) return;
 
       try {
-        const docRef = doc(db, "users", user.uid)
-        const docSnap = await getDoc(docRef)
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          setUserData(docSnap.data())
+          setUserData(docSnap.data() as UserData);
         }
       } catch (error) {
-        console.error("Gagal ambil user:", error)
+        console.error("Gagal ambil user:", error);
       }
-    }
+    };
 
-    fetchUser()
-  }, [user])
+    fetchUser();
+  }, [user]);
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -55,17 +59,16 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-6 relative">
-          {/* NOTIFICATION */}
           <div className="relative">
             <button
               onClick={() => {
-                setShowNotif(!showNotif);
+                setShowNotif((prev) => !prev);
                 setShowUserMenu(false);
               }}
               className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
             >
               <Bell size={24} />
-              <span className="absolute right-1 top-1 h-2 w-2 animate-pulse rounded-full bg-red-500"></span>
+              <span className="absolute right-1 top-1 h-2 w-2 animate-pulse rounded-full bg-red-500" />
             </button>
 
             {showNotif && (
@@ -81,13 +84,12 @@ export default function Navbar() {
             )}
           </div>
 
-          <div className="h-6 w-px bg-slate-200"></div>
+          <div className="h-6 w-px bg-slate-200" />
 
-          {/* USER MENU */}
           <div className="relative">
             <div
               onClick={() => {
-                setShowUserMenu(!showUserMenu);
+                setShowUserMenu((prev) => !prev);
                 setShowNotif(false);
               }}
               className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 hover:bg-slate-50"
@@ -95,6 +97,7 @@ export default function Navbar() {
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-purple-600 text-sm font-bold text-white">
                 {userData?.username?.charAt(0)?.toUpperCase() || "U"}
               </div>
+
               <div className="hidden sm:block">
                 <p className="text-sm font-semibold text-slate-900">
                   {userData?.username || user?.email}
