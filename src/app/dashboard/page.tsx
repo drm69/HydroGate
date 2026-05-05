@@ -1,27 +1,61 @@
-'use client';
+"use client";
 
-import Sidebar from './components/Sidebar';
-import Navbar from './components/Navbar';
-import StatusCard from './components/StatusCard';
-import WaterLevelChart from './components/WaterLevelChart';
-import GateControlPanel from './components/GateControlPanel';
-import ActivityLog from './components/ActivityLog';
-import { Droplet, Lock, Zap, AlertTriangle } from 'lucide-react';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthContext } from "@/components/AuthProvider";
+
+import Sidebar from "./components/Sidebar";
+import Navbar from "./components/Navbar";
+import StatusCard from "./components/StatusCard";
+import WaterLevelChart from "./components/WaterLevelChart";
+import GateControlPanel from "./components/GateControlPanel";
+import ActivityLog from "./components/ActivityLog";
+import { Lock } from "lucide-react";
 
 export default function Dashboard() {
+  const router = useRouter();
+  const { user, loading } = useAuthContext();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/auth/login");
+    }
+  }, [loading, user, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <div className="mb-3 text-lg font-semibold text-slate-700">
+            Memuat dashboard...
+          </div>
+          <p className="text-sm text-slate-500">
+            Mengecek autentikasi pengguna
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
   return (
     <div className="flex bg-slate-50">
-      {/* Sidebar */}
       <Sidebar />
 
-      {/* Main Content */}
       <main className="flex-1 ml-64">
-        {/* Navbar */}
         <Navbar />
 
-        {/* Dashboard Content */}
         <div className="p-8">
-          {/* Status Cards */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-slate-900">
+              Dashboard Overview
+            </h1>
+            <p className="text-sm text-slate-600 mt-1">
+              Selamat datang, {user.displayName || user.email}
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatusCard
               title="Water Level"
@@ -61,16 +95,12 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* Charts and Control Panel */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            {/* Water Level Chart - Takes 2 columns */}
             <div className="lg:col-span-2">
               <WaterLevelChart />
             </div>
 
-            {/* Quick Stats */}
             <div className="space-y-4">
-              {/* System Health */}
               <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
                 <h3 className="text-lg font-bold text-slate-900 mb-4">System Health</h3>
                 <div className="space-y-3">
@@ -93,7 +123,6 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Alert Summary */}
               <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl border-2 border-red-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
                 <h3 className="text-lg font-bold text-slate-900 mb-4">⚠️ Active Alerts</h3>
                 <div className="space-y-3">
@@ -113,18 +142,15 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Gate Control Panel */}
           <div className="mb-8">
             <GateControlPanel />
           </div>
 
-          {/* Activity Log and Footer */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <ActivityLog />
             </div>
 
-            {/* Quick Actions */}
             <div className="space-y-4">
               <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
                 <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h3>
@@ -145,7 +171,6 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Key Information */}
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 p-6 shadow-sm">
                 <h3 className="text-sm font-bold text-slate-900 mb-3">ℹ️ Key Information</h3>
                 <div className="text-xs text-slate-700 space-y-2">
@@ -158,9 +183,11 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-slate-200 text-center text-sm text-slate-500">
-            <p>HydroGate © 2024 | Dam Gate Monitoring System | Status: <span className="text-green-600 font-semibold">● Online</span></p>
+            <p>
+              HydroGate © 2024 | Dam Gate Monitoring System | Status:{" "}
+              <span className="text-green-600 font-semibold">● Online</span>
+            </p>
           </footer>
         </div>
       </main>
