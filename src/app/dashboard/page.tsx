@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/components/AuthProvider";
 
@@ -33,7 +33,7 @@ export default function Dashboard() {
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
 
-  async function fetchDynamoData() {
+  const fetchDynamoData = useCallback(async () => {
     try {
       setFetching(true);
       setError("");
@@ -42,20 +42,28 @@ export default function Dashboard() {
         cache: "no-store",
       });
 
-      const json = await res.json();
+      const json: { items?: DynamoItem[]; detail?: string; error?: string } =
+        await res.json();
 
       if (!res.ok) {
-        throw new Error(json.detail || json.error || "Gagal mengambil data");
+        throw new Error(
+          json.detail || json.error || "Gagal mengambil data"
+        );
       }
 
       setItems(json.items || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Fetch DynamoDB error:", err);
-      setError(err.message || "Gagal mengambil data DynamoDB");
+
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Gagal mengambil data DynamoDB");
+      }
     } finally {
       setFetching(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -64,9 +72,13 @@ export default function Dashboard() {
   }, [loading, user, router]);
 
   useEffect(() => {
-    if (user) {
-      fetchDynamoData();
-    }
+    if (!user) return;
+
+    const timer = setTimeout(() => {
+      void fetchDynamoData();
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [user]);
 
   const sortedItems = useMemo(() => {
@@ -312,8 +324,8 @@ export default function Dashboard() {
 
               <div
                 className={`rounded-xl border-2 p-6 shadow-sm ${activeAlerts.length > 0
-                    ? "bg-gradient-to-br from-red-50 to-orange-50 border-red-200"
-                    : "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200"
+                  ? "bg-gradient-to-br from-red-50 to-orange-50 border-red-200"
+                  : "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200"
                   }`}
               >
                 <h3 className="text-lg font-bold text-slate-900 mb-4">
