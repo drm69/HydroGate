@@ -2,7 +2,6 @@
 
 import { AlertCircle, CheckCircle2, Info, Wrench } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { useEffect, useState } from 'react';
 
 interface Activity {
   id: string;
@@ -13,12 +12,13 @@ interface Activity {
   user?: string;
 }
 
-const createActivities = (): Activity[] => [
+const activities: Activity[] = [
   {
     id: '1',
     type: 'alert',
     title: 'Water Level Critical - Auto Gate Open',
-    description: 'Water level exceeded 75m threshold - Main gate automatically opened to 85% capacity',
+    description:
+      'Water level exceeded 75m threshold - Main gate automatically opened to 85% capacity',
     timestamp: new Date(Date.now() - 5 * 60000),
     user: 'System (Auto)',
   },
@@ -34,7 +34,8 @@ const createActivities = (): Activity[] => [
     id: '3',
     type: 'success',
     title: 'Gate Auto-Closed Successfully',
-    description: 'Water level dropped to 68m - Main gate automatically closed to prevent overflow',
+    description:
+      'Water level dropped to 68m - Main gate automatically closed to prevent overflow',
     timestamp: new Date(Date.now() - 1.5 * 3600000),
     user: 'System (Auto)',
   },
@@ -50,7 +51,8 @@ const createActivities = (): Activity[] => [
     id: '5',
     type: 'success',
     title: 'System Initialization Complete',
-    description: 'HydroGate monitoring system initialized with auto-control enabled',
+    description:
+      'HydroGate monitoring system initialized with auto-control enabled',
     timestamp: new Date(Date.now() - 4 * 3600000),
     user: 'System',
   },
@@ -58,21 +60,14 @@ const createActivities = (): Activity[] => [
     id: '6',
     type: 'info',
     title: 'Sensor Calibration Done',
-    description: 'Main Gate sensor berhasil dikalibrasi untuk akurasi maksimal',
+    description:
+      'Main Gate sensor berhasil dikalibrasi untuk akurasi maksimal',
     timestamp: new Date(Date.now() - 6 * 3600000),
     user: 'Sarah Johnson',
   },
 ];
 
 export default function ActivityLog() {
-  const [isClient, setIsClient] = useState(false);
-  const [activities, setActivities] = useState<Activity[]>([]);
-
-  useEffect(() => {
-    setIsClient(true);
-    setActivities(createActivities());
-  }, []);
-
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'alert':
@@ -104,47 +99,59 @@ export default function ActivityLog() {
   };
 
   const formatTime = (timestamp: Date) => {
-    if (!isClient) return 'recently';
     return formatDistanceToNow(timestamp, { addSuffix: true });
   };
+
   return (
     <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-bold text-slate-900">Recent Activity</h3>
-          <p className="text-sm text-slate-500 mt-1">Latest system events and operations</p>
+          <p className="text-sm text-slate-500 mt-1">
+            Latest system events and operations
+          </p>
         </div>
         <button className="text-xs font-semibold text-blue-600 hover:text-blue-700 px-3 py-2 hover:bg-blue-50 rounded-lg transition-all duration-200">
           View All
         </button>
       </div>
 
-      {/* Activity List */}
       <div className="space-y-3 max-h-96 overflow-y-auto">
         {activities.map((activity) => (
-          <div key={activity.id} className={`rounded-lg p-4 ${getActivityBgColor(activity.type)} transition-all duration-200 hover:shadow-sm`}>
+          <div
+            key={activity.id}
+            className={`rounded-lg p-4 ${getActivityBgColor(
+              activity.type
+            )} transition-all duration-200 hover:shadow-sm`}
+          >
             <div className="flex gap-4">
-              {/* Icon */}
               <div className="flex-shrink-0 pt-1">
                 {getActivityIcon(activity.type)}
               </div>
 
-              {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-bold text-slate-900">{activity.title}</p>
-                    <p className="text-xs text-slate-600 mt-1">{activity.description}</p>
+                    <p className="text-sm font-bold text-slate-900">
+                      {activity.title}
+                    </p>
+                    <p className="text-xs text-slate-600 mt-1">
+                      {activity.description}
+                    </p>
                   </div>
-                  <span className="text-xs font-semibold text-slate-500 flex-shrink-0 ml-2">
+
+                  <span
+                    className="text-xs font-semibold text-slate-500 flex-shrink-0 ml-2"
+                    suppressHydrationWarning
+                  >
                     {formatTime(activity.timestamp)}
                   </span>
                 </div>
 
-                {/* User Info */}
                 {activity.user && (
                   <p className="text-xs text-slate-500 mt-2">
-                    <span className="font-semibold">By:</span> {activity.user}
+                    <span className="font-semibold">By:</span>{' '}
+                    {activity.user}
                   </p>
                 )}
               </div>
@@ -153,7 +160,6 @@ export default function ActivityLog() {
         ))}
       </div>
 
-      {/* Footer */}
       <div className="mt-4 pt-4 border-t border-slate-200">
         <button className="w-full py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
           → View Complete Activity Log

@@ -9,18 +9,18 @@ export default function LayoutWrapper({
 }: {
   children: React.ReactNode
 }) {
-  const pathname = usePathname()
+  const pathname = usePathname() || ""
 
   const disableRoutes = ["/dashboard", "/auth/login", "/auth/register", "/404"]
 
-  const isDisabled = disableRoutes.some((route) =>
-    pathname.startsWith(route)
+  const isDisabled = disableRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
   )
 
   return (
     <>
       {!isDisabled && <Navbar />}
-      {children}
+      <main>{children}</main>
       {!isDisabled && <Footer />}
     </>
   )
