@@ -39,9 +39,6 @@ export default function Monitoring() {
 
   const fetchDynamoData = useCallback(async () => {
     try {
-      setLoading(true);
-      setError('');
-
       const res = await fetch('/api/dynamodb', {
         cache: 'no-store',
       });
@@ -59,6 +56,7 @@ export default function Monitoring() {
       }
 
       setItems(json.items || []);
+      setError('');
     } catch (err: unknown) {
       console.error('Fetch DynamoDB error:', err);
 
@@ -73,9 +71,9 @@ export default function Monitoring() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchDynamoData();
 
-    // realtime refresh tiap 5 detik
     const interval = setInterval(() => {
       void fetchDynamoData();
     }, 5000);
@@ -118,8 +116,8 @@ export default function Monitoring() {
 
         lastUpdate: item.timestamp || item.createdAt
           ? new Date(
-              String(item.timestamp || item.createdAt)
-            ).toLocaleTimeString('id-ID')
+            String(item.timestamp || item.createdAt)
+          ).toLocaleTimeString('id-ID')
           : '-',
       };
     }
@@ -173,11 +171,10 @@ export default function Monitoring() {
                     </p>
 
                     <p
-                      className={`text-3xl font-bold mt-1 ${
-                        latest.status === 'open'
-                          ? 'text-emerald-600'
-                          : 'text-gray-600'
-                      }`}
+                      className={`text-3xl font-bold mt-1 ${latest.status === 'open'
+                        ? 'text-emerald-600'
+                        : 'text-gray-600'
+                        }`}
                     >
                       {latest.status === 'open'
                         ? 'Terbuka'
@@ -292,18 +289,16 @@ export default function Monitoring() {
 
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
-                            gate.status === 'open'
-                              ? 'bg-emerald-100 text-emerald-700'
-                              : 'bg-gray-100 text-gray-700'
-                          }`}
+                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${gate.status === 'open'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-gray-100 text-gray-700'
+                            }`}
                         >
                           <span
-                            className={`w-2 h-2 rounded-full ${
-                              gate.status === 'open'
-                                ? 'bg-emerald-500'
-                                : 'bg-gray-400'
-                            }`}
+                            className={`w-2 h-2 rounded-full ${gate.status === 'open'
+                              ? 'bg-emerald-500'
+                              : 'bg-gray-400'
+                              }`}
                           />
 
                           {gate.status === 'open'
